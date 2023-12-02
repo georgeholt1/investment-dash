@@ -60,6 +60,7 @@ header = html.H4(
     className="bg-primary text-white p-3 mb-2 text-center"
 )
 
+# Principal
 initial_amount_component = html.Div(
     [
         dcc.Input(
@@ -71,13 +72,21 @@ initial_amount_component = html.Div(
     ]
 )
 
+# Rate of return
+rate_of_return_min = 0
+rate_of_return_max = 100
+rate_of_return_step = 0.1
+
 rate_of_return_input_component = html.Div(
     [
         dcc.Input(
             id="input-rate-of-return",
             type="number",
             placeholder="Rate of return",
-            value=INTEREST_RATE_PERCENT_DEFAULT
+            value=INTEREST_RATE_PERCENT_DEFAULT,
+            min=rate_of_return_min,
+            max=rate_of_return_max,
+            step=rate_of_return_step,
         )
     ]
 )
@@ -85,25 +94,48 @@ rate_of_return_input_component = html.Div(
 rate_of_return_slider_component = html.Div(
     [
         dcc.Slider(
-            min=0,
-            max=100,
-            step=0.1,
+            min=rate_of_return_min,
+            max=rate_of_return_max,
+            step=rate_of_return_step,
             updatemode="drag",
             id="slider-rate-of-return",
-            value=8,
+            value=INTEREST_RATE_PERCENT_DEFAULT,
             marks=None,
             tooltip={"placement": "bottom", "always_visible": True}
         )
     ]
 )
 
-investment_period_component = html.Div(
+# Period
+investment_period_min = 1
+investment_period_max = 100
+investment_period_step = 1
+
+investment_period_input_component = html.Div(
     [
         dcc.Input(
             id="input-investment-period",
             type="number",
             placeholder="Investment period",
-            value=PERIODS_YEARS_DEFAULT
+            value=PERIODS_YEARS_DEFAULT,
+            min=investment_period_min,
+            max=investment_period_max,
+            step=investment_period_step
+        )
+    ]
+)
+
+investment_period_slider_component = html.Div(
+    [
+        dcc.Slider(
+            min=investment_period_min,
+            max=investment_period_max,
+            step=investment_period_step,
+            updatemode="drag",
+            id="slider-investment-period",
+            value=PERIODS_YEARS_DEFAULT,
+            marks=None,
+            tooltip={"placement": "bottom", "always_visible": True}
         )
     ]
 )
@@ -152,7 +184,8 @@ controls_card = dbc.Card(
             ]),
             dbc.Row([
                 dbc.Col([dbc.Label("Period (years)")]),
-                dbc.Col([investment_period_component])
+                dbc.Col([investment_period_input_component]),
+                dbc.Col([investment_period_slider_component])
             ]),
             dbc.Row([
                 dbc.Col([dbc.Label("Contributions")]),
@@ -192,17 +225,21 @@ app.layout = dbc.Container(
     Output("graph", "figure"),
     Output("slider-rate-of-return", "value"),
     Output("input-rate-of-return", "value"),
+    Output("slider-investment-period", "value"),
+    Output("input-investment-period", "value"),
     Input("input-initial-amount", "value"),
     Input("input-rate-of-return", "value"),
     Input("slider-rate-of-return", "value"),
     Input("input-investment-period", "value"),
+    Input("slider-investment-period", "value"),
     Input("input-contributions", "value")
 )
 def update(
     initial_amount,
     rate_of_return_input,
     rate_of_return_slider,
-    investment_period,
+    investment_period_input,
+    investment_period_slider,
     contributions
 ):
     # Make sliders and inputs consistent
@@ -213,6 +250,11 @@ def update(
         rate_of_return = rate_of_return_slider
     else:
         rate_of_return = rate_of_return_input
+
+    if trigger_id == "slider-investment-period":
+        investment_period = investment_period_slider
+    else:
+        investment_period = investment_period_input
 
     # Update line plot
     t, amount = compound_interest(
@@ -227,7 +269,11 @@ def update(
         y=amount
     )
 
-    return fig, rate_of_return, rate_of_return
+    return (
+        fig,
+        rate_of_return, rate_of_return,
+        investment_period, investment_period
+    )
 
 
 if __name__ == "__main__":
