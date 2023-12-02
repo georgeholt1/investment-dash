@@ -14,14 +14,33 @@ def compound_interest(
         periods : int,
         contributions : float
     ) -> (np.ndarray, np.ndarray):
-    """Calculate compound interest with contributions."""
+    """Calculate compound interest with contributions.
+
+    Assumes additional contributions are made at the start of each period.
+
+    Formula from:
+    https://math.stackexchange.com/questions/1698578/compound-interest-formula-adding-annual-contributions
+    
+    Parameters
+    ----------
+    initial_amount : float
+        Principal.
+    interest_rate : float
+        Interest rate expressed as a decimal per `periods`.
+    periods : int
+        Number of periods over which to accumulate interest.
+    contributions : float
+        Additional contributions made each investment period.
+    """
     periods = np.arange(periods)
     
     p = initial_amount
     r = interest_rate
     c = contributions
 
-    f = (p + c / r) * (1 + r) ** periods - c / r
+    d = r / (1 + r)  # discount rate
+
+    f = (p + c / d) * (1 + r) ** periods - c / d
 
     return periods, f
 
