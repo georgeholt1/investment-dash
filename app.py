@@ -91,21 +91,6 @@ rate_of_return_input_component = html.Div(
     ]
 )
 
-rate_of_return_slider_component = html.Div(
-    [
-        dcc.Slider(
-            min=rate_of_return_min,
-            max=rate_of_return_max,
-            step=rate_of_return_step,
-            updatemode="drag",
-            id="slider-rate-of-return",
-            value=INTEREST_RATE_PERCENT_DEFAULT,
-            marks=None,
-            tooltip={"placement": "bottom", "always_visible": True}
-        )
-    ]
-)
-
 # Period
 investment_period_min = 1
 investment_period_max = 100
@@ -121,21 +106,6 @@ investment_period_input_component = html.Div(
             min=investment_period_min,
             max=investment_period_max,
             step=investment_period_step
-        )
-    ]
-)
-
-investment_period_slider_component = html.Div(
-    [
-        dcc.Slider(
-            min=investment_period_min,
-            max=investment_period_max,
-            step=investment_period_step,
-            updatemode="drag",
-            id="slider-investment-period",
-            value=PERIODS_YEARS_DEFAULT,
-            marks=None,
-            tooltip={"placement": "bottom", "always_visible": True}
         )
     ]
 )
@@ -180,12 +150,10 @@ controls_card = dbc.Card(
             dbc.Row([
                 dbc.Col([dbc.Label("Rate of return")]),
                 dbc.Col([rate_of_return_input_component]),
-                dbc.Col([rate_of_return_slider_component])
             ]),
             dbc.Row([
                 dbc.Col([dbc.Label("Period (years)")]),
                 dbc.Col([investment_period_input_component]),
-                dbc.Col([investment_period_slider_component])
             ]),
             dbc.Row([
                 dbc.Col([dbc.Label("Contributions")]),
@@ -223,38 +191,17 @@ app.layout = dbc.Container(
 
 @app.callback(
     Output("graph", "figure"),
-    Output("slider-rate-of-return", "value"),
-    Output("input-rate-of-return", "value"),
-    Output("slider-investment-period", "value"),
-    Output("input-investment-period", "value"),
     Input("input-initial-amount", "value"),
     Input("input-rate-of-return", "value"),
-    Input("slider-rate-of-return", "value"),
     Input("input-investment-period", "value"),
-    Input("slider-investment-period", "value"),
     Input("input-contributions", "value")
 )
 def update(
     initial_amount,
-    rate_of_return_input,
-    rate_of_return_slider,
-    investment_period_input,
-    investment_period_slider,
+    rate_of_return,
+    investment_period,
     contributions
 ):
-    # Make sliders and inputs consistent
-    ctx = dash.callback_context
-    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-    if trigger_id == "slider-rate-of-return":
-        rate_of_return = rate_of_return_slider
-    else:
-        rate_of_return = rate_of_return_input
-
-    if trigger_id == "slider-investment-period":
-        investment_period = investment_period_slider
-    else:
-        investment_period = investment_period_input
 
     # Update line plot
     t, amount = compound_interest(
@@ -269,11 +216,7 @@ def update(
         y=amount
     )
 
-    return (
-        fig,
-        rate_of_return, rate_of_return,
-        investment_period, investment_period
-    )
+    return fig
 
 
 if __name__ == "__main__":
