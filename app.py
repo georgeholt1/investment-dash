@@ -6,13 +6,14 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import numpy as np
+import pandas as pd
 
 
 def compound_interest(
         initial_amount: float,
         interest_rate: float,
-        periods : int,
-        contributions : float
+        periods: int,
+        contributions: float
     ) -> (np.ndarray, np.ndarray):
     """Calculate compound interest with contributions.
 
@@ -45,20 +46,117 @@ def compound_interest(
     return periods, f
 
 
-INITIAL_AMOUNT_DEFAULT = 1000      # default principal
-INTEREST_RATE_PERCENT_DEFAULT = 6          # default annual interest, percent
-INTEREST_RATE_MONTHLY_DEFAULT = INTEREST_RATE_PERCENT_DEFAULT * 0.01 / 12
-PERIODS_YEARS_DEFAULT = 10              # default investment period, years
-PERIODS_MONTHS_DEFAULT = PERIODS_YEARS_DEFAULT * 12
-CONTRIBUTIONS_DEFAULT = 0          # default additional contributions per period
+def investment_evolution_breakdown(
+        initial_amount: float,
+        interest_rate: float,
+        periods: int,
+        contributions: float
+    ) -> pd.DataFrame:
+    """Evolution of investment over time by contribution.
+    
+    Calculates the total value of investment over a given period broken down 
+    into the amount due to additional contributions and the amount due to
+    interest.
 
-T_DEFAULT, AMOUNT_DEFAULT = compound_interest(
+    Parameters
+    ----------
+    initial_amount : float
+        Principal.
+    interest_rate : float
+        Interest rate expressed as a decimal per `periods`.
+    periods : int
+        Number of periods over which to accumulate interest.
+    contributions : float
+        Additional contributions made each investment period.
+
+    Returns
+    -------
+    pandas DataFrame
+        With columns:
+            - `period` : investment period index
+            - `value` : total investment value
+            - `value_from_contributions` : portion of total investment value
+              due to additional contributions
+            - `value_from_interest` : portion of total investment value due
+              to interest
+    """
+    periods_list, investment_value = compound_interest(
+        initial_amount,
+        interest_rate,
+        periods,
+        contributions
+    )
+
+    investment_contributions = contributions * np.arange(periods) + \
+        initial_amount
+
+    amount_from_interest = investment_value - investment_contributions
+
+    df = pd.DataFrame({
+        'period': periods_list,
+        'value': investment_value,
+        'value_from_contributions': investment_contributions,
+        'value_from_interest': amount_from_interest
+    })
+
+    return df
+
+
+def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
+    """Plotly line graph of investment over time.
+    
+    Parameters
+    ----------
+    df : pandas DataFrame
+        DataFrame containing investment value over time.
+    show_breakdown : bool, optional
+        Whether to show breakdown of total investment amount due to 
+        contributions and interest. Defaults to False.
+    """
+    df['year'] = df['period'] / 12
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=df['year'],
+        y=df['value'],
+        name='Balance',
+        showlegend=True
+    ))
+
+    if show_breakdown:
+        fig.add_trace(go.Scatter(
+            x=df['year'],
+            y=df['value_from_contributions'],
+            name='Principal'
+        ))
+        fig.add_trace(go.Scatter(
+            x=df['year'],
+            y=df['value_from_interest'],
+            name='Interest'
+        ))
+    
+    fig.update_xaxes(title='Year')
+    fig.update_yaxes(title='Investment value')
+    
+    return fig
+
+
+# Defaults
+INITIAL_AMOUNT_DEFAULT = 1000  # default principal
+INTEREST_RATE_PERCENT_DEFAULT = 6  # default annual interest, percent
+INTEREST_RATE_MONTHLY_DEFAULT = INTEREST_RATE_PERCENT_DEFAULT * 0.01 / 12
+PERIODS_YEARS_DEFAULT = 10  # default investment period, years
+PERIODS_MONTHS_DEFAULT = PERIODS_YEARS_DEFAULT * 12
+CONTRIBUTIONS_DEFAULT = 100  # default additional contributions per period
+
+DF_DEFAULT = investment_evolution_breakdown(
     INITIAL_AMOUNT_DEFAULT,
     INTEREST_RATE_MONTHLY_DEFAULT,
     PERIODS_MONTHS_DEFAULT,
     CONTRIBUTIONS_DEFAULT
 )
-T_DEFAULT_YEARS = T_DEFAULT / 12
+DF_DEFAULT['years']  = DF_DEFAULT['period'] / 12
 
 
 # dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
@@ -80,13 +178,16 @@ header = html.H4(
 )
 
 # Principal
+principal_min = 0
+
 initial_amount_component = html.Div(
     [
         dcc.Input(
             id="input-initial-amount",
             type="number",
             placeholder="Initial amount",
-            value=INITIAL_AMOUNT_DEFAULT
+            value=INITIAL_AMOUNT_DEFAULT,
+            min=principal_min
         )
     ]
 )
@@ -129,13 +230,16 @@ investment_period_input_component = html.Div(
     ]
 )
 
+# Additional contributions
+contributions_min = 0
 contributions_component = html.Div(
     [
         dcc.Input(
             id="input-contributions",
             type="number",
             placeholder="Contributions",
-            value=CONTRIBUTIONS_DEFAULT
+            value=CONTRIBUTIONS_DEFAULT,
+            min=contributions_min
         )
     ]
 )
@@ -144,11 +248,16 @@ graph_component = html.Div(
     [
         dcc.Graph(
             id="graph",
-            figure=px.line(
-                x=T_DEFAULT_YEARS,
-                y=AMOUNT_DEFAULT,
-                # template="bootstrap"
-            )
+            figure=plot_line_graph(DF_DEFAULT)
+        )
+    ]
+)
+
+breakdown_checklist_component = html.Div(
+    [
+        dcc.Checklist(
+            options=[{'label': 'Show breakdown', 'value': 'show-breakdown'}],
+            id='checklist-breakdown',
         )
     ]
 )
@@ -185,6 +294,7 @@ controls_card = dbc.Card(
 graph_card = dbc.Card(
     [
         dbc.Container([
+            dbc.Row([breakdown_checklist_component]),
             dbc.Row([graph_component])
         ])
     ]
@@ -213,37 +323,30 @@ app.layout = dbc.Container(
     Input("input-initial-amount", "value"),
     Input("input-rate-of-return", "value"),
     Input("input-investment-period", "value"),
-    Input("input-contributions", "value")
+    Input("input-contributions", "value"),
+    Input("checklist-breakdown", "value")
 )
 def update(
     initial_amount,
     rate_of_return,
     investment_period,
-    contributions
+    contributions,
+    breakdown
 ):
+    show_breakdown = 'show-breakdown' in breakdown if breakdown is not None else False
+    # print(show_breakdown)
 
     # Update line plot
-    t, amount = compound_interest(
+    df = investment_evolution_breakdown(
         initial_amount,
         rate_of_return*0.01/12, # convert from percentage
         investment_period*12,   # convert to months
         contributions
     )
-    t_years = t / 12
-    fig = px.line(
-        x=t_years,
-        y=amount
-    )
+    fig = plot_line_graph(df, show_breakdown)
 
     return fig
 
 
 if __name__ == "__main__":
     app.run_server(debug=True)
-
-
-
-
-
-
-
