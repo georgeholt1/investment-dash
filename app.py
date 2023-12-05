@@ -142,13 +142,59 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
     return fig
 
 
+def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
+    """Plotly pie chart of contributions to final investment.
+    
+    Parameters
+    ----------
+    df : pandas DataFrame
+        DataFrame containing investment value of time. The data in the last
+        row is used for the amount due to contributions and interest and
+        the data in the first row is used for the initial principal.
+    percentage : bool, optional
+        Whether to display data as percentage. Defaults to False, which displays
+        the actual values.
+    """
+    labels = [
+        'Initial principal',
+        'Contributions',
+        'Interest'
+    ]
+    values = [
+        df.iloc[0]['value'],
+        df.iloc[-1]['value_from_contributions'],
+        df.iloc[-1]['value_from_interest'],
+    ]
+
+    fig = go.Figure(
+        data=go.Pie(
+            labels=labels,
+            values=values
+        )
+    )
+
+    if percentage:
+        fig.update_traces(
+            hoverinfo='label+value',
+            textinfo='percent'
+        )
+
+    else:
+        fig.update_traces(
+            hoverinfo='label+percent',
+            textinfo='value'
+        )
+
+    return fig
+
+
 # Defaults
-INITIAL_AMOUNT_DEFAULT = 1000  # default principal
+INITIAL_AMOUNT_DEFAULT = 10000  # default principal
 INTEREST_RATE_PERCENT_DEFAULT = 6  # default annual interest, percent
 INTEREST_RATE_MONTHLY_DEFAULT = INTEREST_RATE_PERCENT_DEFAULT * 0.01 / 12
-PERIODS_YEARS_DEFAULT = 10  # default investment period, years
+PERIODS_YEARS_DEFAULT = 30  # default investment period, years
 PERIODS_MONTHS_DEFAULT = PERIODS_YEARS_DEFAULT * 12
-CONTRIBUTIONS_DEFAULT = 100  # default additional contributions per period
+CONTRIBUTIONS_DEFAULT = 1000  # default additional contributions per period
 
 DF_DEFAULT = investment_evolution_breakdown(
     INITIAL_AMOUNT_DEFAULT,
@@ -244,6 +290,7 @@ contributions_component = html.Div(
     ]
 )
 
+# Line graph
 graph_component = html.Div(
     [
         dcc.Graph(
@@ -257,7 +304,27 @@ breakdown_checklist_component = html.Div(
     [
         dcc.Checklist(
             options=[{'label': 'Show breakdown', 'value': 'show-breakdown'}],
+            value=['show-breakdown'],
             id='checklist-breakdown',
+        )
+    ]
+)
+
+# Pie chart
+pie_chart_component = html.Div(
+    [
+        dcc.Graph(
+            id="pie-chart",
+            figure=plot_pie_chart(DF_DEFAULT)
+        )
+    ]
+)
+
+pie_chart_percentage_component = html.Div(
+    [
+        dcc.Checklist(
+            options=[{'label': 'Percentage', 'value': 'percentage'}],
+            id='checklist-percentage'
         )
     ]
 )
@@ -300,6 +367,15 @@ graph_card = dbc.Card(
     ]
 )
 
+pie_card = dbc.Card(
+    [
+        dbc.Container([
+            dbc.Row([pie_chart_percentage_component]),
+            dbc.Row([pie_chart_component]),
+        ])
+    ]
+)
+
 
 # App
 # ---
@@ -308,7 +384,8 @@ app.layout = dbc.Container(
     [
         header,
         controls_card,
-        graph_card
+        graph_card,
+        pie_card
     ],
     fluid=True,
     className="dbc"
@@ -320,21 +397,25 @@ app.layout = dbc.Container(
 
 @app.callback(
     Output("graph", "figure"),
+    Output("pie-chart", "figure"),
     Input("input-initial-amount", "value"),
     Input("input-rate-of-return", "value"),
     Input("input-investment-period", "value"),
     Input("input-contributions", "value"),
-    Input("checklist-breakdown", "value")
+    Input("checklist-breakdown", "value"),
+    Input("checklist-percentage", "value"),
 )
 def update(
     initial_amount,
     rate_of_return,
     investment_period,
     contributions,
-    breakdown
+    breakdown,
+    percentage,
 ):
+    # True if box is ticked
     show_breakdown = 'show-breakdown' in breakdown if breakdown is not None else False
-    # print(show_breakdown)
+    percentage = 'percentage' in percentage if percentage is not None else False
 
     # Update line plot
     df = investment_evolution_breakdown(
@@ -343,9 +424,12 @@ def update(
         investment_period*12,   # convert to months
         contributions
     )
-    fig = plot_line_graph(df, show_breakdown)
+    fig_line_graph = plot_line_graph(df, show_breakdown)
 
-    return fig
+    # Update pie chart
+    fig_pie_chart = plot_pie_chart(df, percentage)
+
+    return fig_line_graph, fig_pie_chart
 
 
 if __name__ == "__main__":
