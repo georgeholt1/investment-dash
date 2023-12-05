@@ -2,7 +2,6 @@ import dash
 from dash_bootstrap_templates import ThemeChangerAIO, template_from_url
 from dash.dependencies import Input, Output
 from dash import dcc, html
-import plotly.express as px
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import numpy as np
@@ -33,7 +32,7 @@ def compound_interest(
     contributions : float
         Additional contributions made each investment period.
     """
-    periods = np.arange(periods)
+    periods = np.arange(periods+1)
     
     p = initial_amount
     r = interest_rate
@@ -87,7 +86,7 @@ def investment_evolution_breakdown(
         contributions
     )
 
-    investment_contributions = contributions * np.arange(periods) + \
+    investment_contributions = contributions * periods_list + \
         initial_amount
 
     amount_from_interest = investment_value - investment_contributions
@@ -113,6 +112,7 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         Whether to show breakdown of total investment amount due to 
         contributions and interest. Defaults to False.
     """
+    #TODO Format tooltip to show label, year & month, value (2 decimal places)
     df['year'] = df['period'] / 12
 
     fig = go.Figure()
@@ -138,6 +138,8 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
     
     fig.update_xaxes(title='Year')
     fig.update_yaxes(title='Investment value')
+
+    fig.update_layout(hovermode='x unified')
     
     return fig
 
@@ -155,6 +157,7 @@ def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
         Whether to display data as percentage. Defaults to False, which displays
         the actual values.
     """
+    #TODO Format to show 2 decimal places
     labels = [
         'Initial principal',
         'Contributions',
