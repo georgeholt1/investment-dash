@@ -129,7 +129,7 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
     
     fig = go.Figure()
 
-    # Main balancewith customized hover text
+    # Main balance
     fig.add_trace(go.Scatter(
         x=df['year'],
         y=df['value'],
@@ -137,8 +137,12 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         marker=dict(size=marker_sizes, color=COLOR_CONTRIBUTIONS, symbol='circle'),
         line=dict(color=COLOR_CONTRIBUTIONS),
         showlegend=False,
-        hoverinfo='text',
-        text=df.apply(lambda x: f"{x['year_month']}: {x['value']:,.2f}", axis=1),
+        # hoverinfo='text',
+        hoverinfo='skip',
+        # hovertemplate = 
+        # '' +
+        # '<br><b>Balance'
+        # text=df.apply(lambda x: f"{x['year_month']}: {x['value']:,.2f}", axis=1),
     ))
     fig.add_trace(go.Scatter(
         x=[None],
@@ -150,6 +154,23 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         showlegend=True,
     ))
 
+    # Dummy for hover text
+    if not show_breakdown:
+        hovertext=df.apply(lambda x: f"<b>{x['year_month']}</b><br>Balance: {x['value']:,.2f}", axis=1)
+    else:
+        hovertext=df.apply(lambda x: f"<b>{x['year_month']}</b><br>Balance: {x['value']:,.2f}<br>Total contributions: {x['value_from_contributions']:,.2f}<br>Total interest: {x['value_from_interest']:,.2f}", axis=1)
+    
+    fig.add_trace(go.Scatter(
+        x=df['year'],
+        y=df['value'],
+        mode='lines',
+        line=dict(width=0),
+        showlegend=False,
+        hovertext=hovertext,
+        hoverinfo='text'
+        # hovertemplate=hovertext,
+    ))
+
     if show_breakdown:
         # Principal
         fig.add_trace(go.Scatter(
@@ -159,8 +180,9 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
             marker=dict(size=marker_sizes, symbol='square', color=COLOR_INITIAL),
             line=dict(color=COLOR_INITIAL),
             showlegend=False,
-            hoverinfo='text',
-            text=df.apply(lambda x: f"{x['year_month']}: {x['value_from_contributions']:,.2f}", axis=1)
+            hoverinfo='skip',
+            # hoverinfo='text',
+            # text=df.apply(lambda x: f"{x['year_month']}: {x['value_from_contributions']:,.2f}", axis=1)
         ))
         fig.add_trace(go.Scatter(
             x=[None],
@@ -179,8 +201,9 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
             mode='lines+markers',
             marker=dict(size=marker_sizes, symbol='diamond', color=COLOR_INTEREST),
             showlegend=False,
-            hoverinfo='text',
-            text=df.apply(lambda x: f"{x['year_month']}: {x['value_from_interest']:,.2f}", axis=1)
+            # hoverinfo='text',
+            hoverinfo='skip',
+            # text=df.apply(lambda x: f"{x['year_month']}: {x['value_from_interest']:,.2f}", axis=1)
         ))
         fig.add_trace(go.Scatter(
             x=[None],
