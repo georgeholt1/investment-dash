@@ -216,7 +216,6 @@ def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
         Whether to display data as percentage. Defaults to False, which displays
         the actual values.
     """
-    #TODO Format to show 2 decimal places
     labels = [
         'Initial principal',
         'Contributions',
@@ -243,14 +242,15 @@ def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
 
     if percentage:
         fig.update_traces(
-            hoverinfo='label+value',
-            textinfo='percent'
+            textinfo='percent',
+            hovertemplate='%{label}<br>%{value:,.2f}<extra></extra>',
         )
 
     else:
+        fig.update_traces(texttemplate='%{value:,.2f}')
         fig.update_traces(
-            hoverinfo='label+percent',
-            textinfo='value'
+            textinfo='value',
+            hovertemplate='%{label}<br>%{percent:.1%}<extra></extra>',
         )
 
     return fig
