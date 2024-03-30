@@ -9,7 +9,6 @@ import pandas as pd
 
 
 # Global colors for plots
-#TODO make sure these are used everywhere needed
 COLOR_CONTRIBUTIONS = '#636EFA'
 COLOR_INTEREST = '#EF553B'
 COLOR_INITIAL = '#00CC96'
@@ -137,12 +136,7 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         marker=dict(size=marker_sizes, color=COLOR_CONTRIBUTIONS, symbol='circle'),
         line=dict(color=COLOR_CONTRIBUTIONS),
         showlegend=False,
-        # hoverinfo='text',
         hoverinfo='skip',
-        # hovertemplate = 
-        # '' +
-        # '<br><b>Balance'
-        # text=df.apply(lambda x: f"{x['year_month']}: {x['value']:,.2f}", axis=1),
     ))
     fig.add_trace(go.Scatter(
         x=[None],
@@ -154,7 +148,7 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         showlegend=True,
     ))
 
-    # Dummy for hover text
+    # Dummy plot for hover text
     if not show_breakdown:
         hovertext=df.apply(lambda x: f"<b>{x['year_month']}</b><br>Balance: {x['value']:,.2f}", axis=1)
     else:
@@ -168,7 +162,6 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         showlegend=False,
         hovertext=hovertext,
         hoverinfo='text'
-        # hovertemplate=hovertext,
     ))
 
     if show_breakdown:
