@@ -8,6 +8,13 @@ import numpy as np
 import pandas as pd
 
 
+# Global colors for plots
+#TODO make sure these are used everywhere needed
+COLOR_CONTRIBUTIONS = '#636EFA'
+COLOR_INTEREST = '#EF553B'
+COLOR_INITIAL = '#00CC96'
+
+
 def compound_interest(
         initial_amount: float,
         interest_rate: float,
@@ -112,34 +119,86 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         Whether to show breakdown of total investment amount due to 
         contributions and interest. Defaults to False.
     """
-    #TODO Format tooltip to show label, year & month, value (2 decimal places)
+    # Adding a 'year' column for plotting
     df['year'] = df['period'] / 12
 
+    # Adding a 'year_month' column for tooltip display, assuming 'period' starts from 1 for the first month.
+    df['year_month'] = df['period'].apply(lambda x: f"Year {x // 12}, Month {x % 12 if x % 12 != 0 else 12}")
+
+    marker_sizes = [0] * (len(df) - 1) + [10]
+    
     fig = go.Figure()
 
+    # Main balancewith customized hover text
     fig.add_trace(go.Scatter(
         x=df['year'],
         y=df['value'],
+        mode='lines+markers',
+        marker=dict(size=marker_sizes, color=COLOR_CONTRIBUTIONS, symbol='circle'),
+        line=dict(color=COLOR_CONTRIBUTIONS),
+        showlegend=False,
+        hoverinfo='text',
+        text=df.apply(lambda x: f"{x['year_month']}: {x['value']:,.2f}", axis=1),
+    ))
+    fig.add_trace(go.Scatter(
+        x=[None],
+        y=[None],
         name='Balance',
-        showlegend=True
+        mode='lines+markers',
+        marker=dict(color=COLOR_CONTRIBUTIONS, symbol='circle'),
+        line=dict(color=COLOR_CONTRIBUTIONS),
+        showlegend=True,
     ))
 
     if show_breakdown:
+        # Principal
         fig.add_trace(go.Scatter(
             x=df['year'],
             y=df['value_from_contributions'],
-            name='Principal'
+            mode='lines+markers',
+            marker=dict(size=marker_sizes, symbol='square', color=COLOR_INITIAL),
+            line=dict(color=COLOR_INITIAL),
+            showlegend=False,
+            hoverinfo='text',
+            text=df.apply(lambda x: f"{x['year_month']}: {x['value_from_contributions']:,.2f}", axis=1)
         ))
+        fig.add_trace(go.Scatter(
+            x=[None],
+            y=[None],
+            name='Principal',
+            mode='lines+markers',
+            marker=dict(color=COLOR_INITIAL, symbol='square'),
+            line=dict(color=COLOR_INITIAL),
+            showlegend=True
+        ))
+
+        # Interest
         fig.add_trace(go.Scatter(
             x=df['year'],
             y=df['value_from_interest'],
-            name='Interest'
+            mode='lines+markers',
+            marker=dict(size=marker_sizes, symbol='diamond', color=COLOR_INTEREST),
+            showlegend=False,
+            hoverinfo='text',
+            text=df.apply(lambda x: f"{x['year_month']}: {x['value_from_interest']:,.2f}", axis=1)
+        ))
+        fig.add_trace(go.Scatter(
+            x=[None],
+            y=[None],
+            name='Interest',
+            mode='lines+markers',
+            marker=dict(color=COLOR_INTEREST, symbol='diamond'),
+            line=dict(color=COLOR_INTEREST),
+            showlegend=True
         ))
     
     fig.update_xaxes(title='Year')
     fig.update_yaxes(title='Investment value')
 
-    fig.update_layout(hovermode='x unified')
+    fig.update_layout(
+        hovermode='x unified',
+        xaxis_range=(0, df['year'].max()*1.05)
+    )
     
     return fig
 
@@ -354,7 +413,7 @@ controls_card = dbc.Card(
                 dbc.Col([investment_period_input_component]),
             ]),
             dbc.Row([
-                dbc.Col([dbc.Label("Contributions")]),
+                dbc.Col([dbc.Label("Contributions (monthly)")]),
                 dbc.Col([contributions_component])
             ])
         ])
