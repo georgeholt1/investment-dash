@@ -231,7 +231,13 @@ def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
     fig = go.Figure(
         data=go.Pie(
             labels=labels,
-            values=values
+            values=values,
+            sort=False,
+            marker=dict(colors=(
+                '#AB63FA',
+                COLOR_INITIAL,
+                COLOR_INTEREST,
+            ))
         )
     )
 
