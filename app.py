@@ -310,6 +310,21 @@ header = html.H4(
     className="bg-primary text-white p-3 mb-2 text-center",
 )
 
+intro_text = """
+Use this tool to calculate and visualise the future value of an
+investment, including regular contributions, over a given period of
+time. This can be used, for example, to calculate the monthly
+contributions necessary to reach an investment goal over a number of
+years with a known average rate of return. The calculations are updated
+live as the input values are changed. The return is assumed to be
+constant and the currency is not specified.
+"""
+
+intro = html.P(
+    intro_text,
+    className="text-center mb-4",
+)
+
 # Principal
 principal_min = 0
 principal_step = 1000
@@ -382,6 +397,9 @@ contributions_component = html.Div(
     ]
 )
 
+# Final value
+final_value_text = html.Div(id="final-value-text", className="text-center mb-4")
+
 # Line graph
 graph_component = html.Div([dcc.Graph(id="graph", figure=plot_line_graph(DF_DEFAULT))])
 
@@ -413,9 +431,15 @@ pie_chart_percentage_component = html.Div(
 # Cards
 # -----
 
+settings_info_text = """
+Adjust the variables of the investment here by either entering the
+values directly or adjusting them with the arrows that appear when
+hovering over the input boxes.
+"""
 controls_card = dbc.Card(
     [
         html.H4("Settings", className="card-title"),
+        html.P(settings_info_text, className="card-text"),
         dbc.Container(
             [
                 dbc.Row(
@@ -426,7 +450,7 @@ controls_card = dbc.Card(
                 ),
                 dbc.Row(
                     [
-                        dbc.Col([dbc.Label("Rate of return")]),
+                        dbc.Col([dbc.Label("Rate of return (%)")]),
                         dbc.Col([rate_of_return_input_component]),
                     ]
                 ),
@@ -471,7 +495,9 @@ pie_card = dbc.Card(
 # ---
 
 app.layout = dbc.Container(
-    [header, controls_card, graph_card, pie_card], fluid=True, className="dbc"
+    [header, intro, controls_card, final_value_text, graph_card, pie_card],
+    fluid=True,
+    className="dbc",
 )
 
 
@@ -482,6 +508,7 @@ app.layout = dbc.Container(
 @app.callback(
     Output("graph", "figure"),
     Output("pie-chart", "figure"),
+    Output("final-value-text", "children"),
     Input("input-initial-amount", "value"),
     Input("input-rate-of-return", "value"),
     Input("input-investment-period", "value"),
@@ -501,19 +528,36 @@ def update(
     show_breakdown = "show-breakdown" in breakdown if breakdown is not None else False
     percentage = "percentage" in percentage if percentage is not None else False
 
-    # Update line plot
+    # Calculate investment
     df = investment_evolution_breakdown(
         initial_amount,
         rate_of_return * 0.01 / 12,  # convert from percentage
         investment_period * 12,  # convert to months
         contributions,
     )
+    final_value = df.iloc[-1]["value"]
+    total_contributions = df.iloc[-1]["value_from_contributions"]
+    total_interest = df.iloc[-1]["value_from_interest"]
+
+    # Update line plot
     fig_line_graph = plot_line_graph(df, show_breakdown)
 
     # Update pie chart
     fig_pie_chart = plot_pie_chart(df, percentage)
 
-    return fig_line_graph, fig_pie_chart
+    # Text element
+
+    final_value_message = [
+        f"Values after {investment_period} years",
+        html.Br(),
+        f"Final balance: {final_value:,.2f}",
+        html.Br(),
+        f"Total contributions: {total_contributions:,.2f}",
+        html.Br(),
+        f"Total interest: {total_interest:,.2f}",
+    ]
+
+    return fig_line_graph, fig_pie_chart, final_value_message
 
 
 if __name__ == "__main__":
