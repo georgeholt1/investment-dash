@@ -344,6 +344,7 @@ initial_amount_component = html.Div(
             value=INITIAL_AMOUNT_DEFAULT,
             min=principal_min,
             step=principal_step,
+            style=dict(width="50%"),
         )
     ]
 )
@@ -363,6 +364,7 @@ rate_of_return_input_component = html.Div(
             min=rate_of_return_min,
             max=rate_of_return_max,
             step=rate_of_return_step,
+            style=dict(width="50%"),
         )
     ]
 )
@@ -382,6 +384,7 @@ investment_period_input_component = html.Div(
             min=investment_period_min,
             max=investment_period_max,
             step=investment_period_step,
+            style=dict(width="50%"),
         )
     ]
 )
@@ -399,6 +402,7 @@ contributions_component = html.Div(
             value=CONTRIBUTIONS_DEFAULT,
             min=contributions_min,
             step=contributions_step,
+            style=dict(width="50%"),
         )
     ]
 )
