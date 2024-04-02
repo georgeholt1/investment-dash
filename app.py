@@ -316,8 +316,8 @@ investment, including regular contributions, over a given period of
 time. This can be used, for example, to calculate the monthly
 contributions necessary to reach an investment goal over a number of
 years with a known average rate of return. The calculations are updated
-live as the input values are changed. The return is assumed to be
-constant and the currency is not specified.
+live as the input values are changed. Note that currency is not
+specified so that the calculations are valid for all currencies.
 """
 
 intro = html.P(
