@@ -336,17 +336,20 @@ intro = html.P(
 principal_min = 0
 principal_step = 1000
 
-# TODO Use input group
 initial_amount_component = html.Div(
     [
-        dcc.Input(
-            id="input-initial-amount",
-            type="number",
-            placeholder="Initial amount",
-            value=INITIAL_AMOUNT_DEFAULT,
-            min=principal_min,
-            step=principal_step,
-            style=dict(width="50%"),
+        dbc.InputGroup(
+            [
+                dbc.Input(
+                    id="input-initial-amount",
+                    type="number",
+                    placeholder="Initial amount",
+                    value=INITIAL_AMOUNT_DEFAULT,
+                    min=principal_min,
+                    step=principal_step,
+                    style=dict(width="50%"),
+                ),
+            ]
         )
     ]
 )
@@ -358,15 +361,20 @@ rate_of_return_step = 0.1
 
 rate_of_return_input_component = html.Div(
     [
-        dcc.Input(
-            id="input-rate-of-return",
-            type="number",
-            placeholder="Rate of return",
-            value=INTEREST_RATE_PERCENT_DEFAULT,
-            min=rate_of_return_min,
-            max=rate_of_return_max,
-            step=rate_of_return_step,
-            style=dict(width="50%"),
+        dbc.InputGroup(
+            [
+                dbc.Input(
+                    id="input-rate-of-return",
+                    type="number",
+                    placeholder="Rate of return",
+                    value=INTEREST_RATE_PERCENT_DEFAULT,
+                    min=rate_of_return_min,
+                    max=rate_of_return_max,
+                    step=rate_of_return_step,
+                    style=dict(width="50%"),
+                ),
+                dbc.InputGroupText("%"),
+            ]
         )
     ]
 )
@@ -378,15 +386,20 @@ investment_period_step = 1
 
 investment_period_input_component = html.Div(
     [
-        dcc.Input(
-            id="input-investment-period",
-            type="number",
-            placeholder="Investment period",
-            value=PERIODS_YEARS_DEFAULT,
-            min=investment_period_min,
-            max=investment_period_max,
-            step=investment_period_step,
-            style=dict(width="50%"),
+        dbc.InputGroup(
+            [
+                dbc.Input(
+                    id="input-investment-period",
+                    type="number",
+                    placeholder="Investment period",
+                    value=PERIODS_YEARS_DEFAULT,
+                    min=investment_period_min,
+                    max=investment_period_max,
+                    step=investment_period_step,
+                    style=dict(width="50%"),
+                ),
+                dbc.InputGroupText("years"),
+            ]
         )
     ]
 )
@@ -397,14 +410,19 @@ contributions_step = 100
 
 contributions_component = html.Div(
     [
-        dcc.Input(
-            id="input-contributions",
-            type="number",
-            placeholder="Contributions",
-            value=CONTRIBUTIONS_DEFAULT,
-            min=contributions_min,
-            step=contributions_step,
-            style=dict(width="50%"),
+        dbc.InputGroup(
+            [
+                dbc.Input(
+                    id="input-contributions",
+                    type="number",
+                    placeholder="Contributions",
+                    value=CONTRIBUTIONS_DEFAULT,
+                    min=contributions_min,
+                    step=contributions_step,
+                    style=dict(width="50%"),
+                ),
+                dbc.InputGroupText("per month"),
+            ]
         )
     ]
 )
@@ -453,7 +471,6 @@ pie_chart_percentage_component = html.Div(
 # Cards
 # -----
 
-# TODO Separate settings and results, make settings wider
 settings_info_text = """
 Adjust the variables of the investment here by either entering the
 values directly or adjusting them with the arrows that appear when
@@ -479,9 +496,7 @@ controls_card = dbc.Card(
                                         ),
                                         dbc.Row(
                                             [
-                                                dbc.Col(
-                                                    [dbc.Label("Rate of return (%)")]
-                                                ),
+                                                dbc.Col([dbc.Label("Rate of return")]),
                                                 dbc.Col(
                                                     [rate_of_return_input_component]
                                                 ),
@@ -489,7 +504,7 @@ controls_card = dbc.Card(
                                         ),
                                         dbc.Row(
                                             [
-                                                dbc.Col([dbc.Label("Period (years)")]),
+                                                dbc.Col([dbc.Label("Period")]),
                                                 dbc.Col(
                                                     [investment_period_input_component]
                                                 ),
@@ -497,13 +512,7 @@ controls_card = dbc.Card(
                                         ),
                                         dbc.Row(
                                             [
-                                                dbc.Col(
-                                                    [
-                                                        dbc.Label(
-                                                            "Contributions (monthly)"
-                                                        )
-                                                    ]
-                                                ),
+                                                dbc.Col([dbc.Label("Contributions")]),
                                                 dbc.Col([contributions_component]),
                                             ]
                                         ),
