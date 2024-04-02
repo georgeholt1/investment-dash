@@ -493,7 +493,9 @@ controls_card = dbc.Card(
 
 results_card = dbc.Card([html.H4("Results", className="card-title"), results_component])
 
-controls_and_results_cards = dbc.CardGroup([controls_card, results_card])
+controls_and_results_cards = dbc.CardGroup(
+    [controls_card, results_card], className="mb-1"
+)
 
 graph_info = """
 The investment value over time and its components due to the initial
@@ -527,7 +529,8 @@ graph_card = dbc.Card(
                 )
             ]
         ),
-    ]
+    ],
+    className="mb-1",
 )
 
 
