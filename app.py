@@ -535,6 +535,7 @@ controls_card = dbc.Card(
                                     ],
                                     outline=True,
                                     color="primary",
+                                    className="ms-5 me-5",
                                 )
                             ],
                             width=5,
@@ -545,7 +546,7 @@ controls_card = dbc.Card(
         )
     ],
     color="light",
-    className="mb-1",
+    className="mb-1 mt-0",
 )
 
 controls_and_results_cards = controls_card
@@ -653,13 +654,37 @@ def update(
     # TODO Align labels left, values right
     # Text element
     final_value_message = [
-        f"Values after {investment_period} years",
+        html.Div("Values after {} years".format(investment_period)),
         html.Br(),
-        f"Final balance: {final_value:,.2f}",
+        html.Div(
+            [
+                html.Span("Final balance: ", style={"float": "left"}),
+                html.Span(
+                    "{:,.2f}".format(final_value),
+                    style={"float": "right", "clear": "right"},
+                ),
+            ]
+        ),
         html.Br(),
-        f"Total contributions: {total_contributions:,.2f}",
+        html.Div(
+            [
+                html.Span("Total contributions: ", style={"float": "left"}),
+                html.Span(
+                    "{:,.2f}".format(total_contributions),
+                    style={"float": "right", "clear": "right"},
+                ),
+            ]
+        ),
         html.Br(),
-        f"Total interest: {total_interest:,.2f}",
+        html.Div(
+            [
+                html.Span("Total interest: ", style={"float": "left"}),
+                html.Span(
+                    "{:,.2f}".format(total_interest),
+                    style={"float": "right", "clear": "right"},
+                ),
+            ]
+        ),
     ]
 
     return fig_line_graph, fig_pie_chart, final_value_message
