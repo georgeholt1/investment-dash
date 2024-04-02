@@ -398,7 +398,7 @@ contributions_component = html.Div(
 )
 
 # Final value
-final_value_text = html.Div(id="final-value-text", className="text-center mb-4")
+results_component = html.P(id="results-text", className="card-text")
 
 # Line graph
 graph_component = html.Div([dcc.Graph(id="graph", figure=plot_line_graph(DF_DEFAULT))])
@@ -471,6 +471,10 @@ controls_card = dbc.Card(
     ]
 )
 
+results_card = dbc.Card([html.H4("Results", className="card-title"), results_component])
+
+controls_and_results_cards = dbc.CardGroup([controls_card, results_card])
+
 graph_card = dbc.Card(
     [
         dbc.Container(
@@ -497,7 +501,7 @@ pie_card = dbc.Card(
 app.layout = html.Div(
     [
         dbc.Container(
-            [header, intro, controls_card, final_value_text, graph_card, pie_card],
+            [header, intro, controls_and_results_cards, graph_card, pie_card],
             fluid=True,
             className="dbc",
         )
@@ -513,7 +517,7 @@ app.layout = html.Div(
 @app.callback(
     Output("graph", "figure"),
     Output("pie-chart", "figure"),
-    Output("final-value-text", "children"),
+    Output("results-text", "children"),
     Input("input-initial-amount", "value"),
     Input("input-rate-of-return", "value"),
     Input("input-investment-period", "value"),
