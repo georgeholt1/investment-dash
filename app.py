@@ -222,6 +222,7 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
     return fig
 
 
+# TODO style pie chart
 def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
     """Plotly pie chart of contributions to final investment.
 
@@ -335,6 +336,7 @@ intro = html.P(
 principal_min = 0
 principal_step = 1000
 
+# TODO Use input group
 initial_amount_component = html.Div(
     [
         dcc.Input(
@@ -451,6 +453,7 @@ pie_chart_percentage_component = html.Div(
 # Cards
 # -----
 
+# TODO Separate settings and results, make settings wider
 settings_info_text = """
 Adjust the variables of the investment here by either entering the
 values directly or adjusting them with the arrows that appear when
@@ -458,44 +461,85 @@ hovering over the input boxes.
 """
 controls_card = dbc.Card(
     [
-        html.H4("Settings", className="card-title"),
-        html.P(settings_info_text, className="card-text"),
-        dbc.Container(
+        dbc.CardBody(
             [
+                html.H4("Settings", className="card-title"),
                 dbc.Row(
                     [
-                        dbc.Col([dbc.Label("Principal")]),
-                        dbc.Col([initial_amount_component]),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col([dbc.Label("Rate of return (%)")]),
-                        dbc.Col([rate_of_return_input_component]),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col([dbc.Label("Period (years)")]),
-                        dbc.Col([investment_period_input_component]),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col([dbc.Label("Contributions (monthly)")]),
-                        dbc.Col([contributions_component]),
+                        dbc.Col(
+                            [
+                                html.P(settings_info_text, className="card-text"),
+                                dbc.Container(
+                                    [
+                                        dbc.Row(
+                                            [
+                                                dbc.Col([dbc.Label("Principal")]),
+                                                dbc.Col([initial_amount_component]),
+                                            ]
+                                        ),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    [dbc.Label("Rate of return (%)")]
+                                                ),
+                                                dbc.Col(
+                                                    [rate_of_return_input_component]
+                                                ),
+                                            ]
+                                        ),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col([dbc.Label("Period (years)")]),
+                                                dbc.Col(
+                                                    [investment_period_input_component]
+                                                ),
+                                            ]
+                                        ),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    [
+                                                        dbc.Label(
+                                                            "Contributions (monthly)"
+                                                        )
+                                                    ]
+                                                ),
+                                                dbc.Col([contributions_component]),
+                                            ]
+                                        ),
+                                    ]
+                                ),
+                            ],
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Card(
+                                    [
+                                        dbc.CardBody(
+                                            [
+                                                html.H4(
+                                                    "Results", className="card-title"
+                                                ),
+                                                results_component,
+                                            ]
+                                        )
+                                    ],
+                                    outline=True,
+                                    color="primary",
+                                )
+                            ],
+                            width=5,
+                        ),
                     ]
                 ),
             ]
-        ),
-    ]
+        )
+    ],
+    color="light",
+    className="mb-1",
 )
 
-results_card = dbc.Card([html.H4("Results", className="card-title"), results_component])
-
-controls_and_results_cards = dbc.CardGroup(
-    [controls_card, results_card], className="mb-1"
-)
+controls_and_results_cards = controls_card
 
 graph_info = """
 The investment value over time and its components due to the initial
@@ -507,28 +551,32 @@ additional information.
 
 graph_card = dbc.Card(
     [
-        html.H4("Graphs", className="card-title"),
-        html.P(graph_info, className="card-text"),
-        dbc.Container(
+        dbc.CardBody(
             [
-                dbc.Row(
+                html.H4("Graphs", className="card-title"),
+                html.P(graph_info, className="card-text"),
+                dbc.Container(
                     [
-                        dbc.Col(
+                        dbc.Row(
                             [
-                                dbc.Row([breakdown_checklist_component]),
-                                dbc.Row([graph_component]),
+                                dbc.Col(
+                                    [
+                                        dbc.Row([breakdown_checklist_component]),
+                                        dbc.Row([graph_component]),
+                                    ]
+                                ),
+                                dbc.Col(
+                                    [
+                                        dbc.Row([pie_chart_percentage_component]),
+                                        dbc.Row([pie_chart_component]),
+                                    ]
+                                ),
                             ]
-                        ),
-                        dbc.Col(
-                            [
-                                dbc.Row([pie_chart_percentage_component]),
-                                dbc.Row([pie_chart_component]),
-                            ]
-                        ),
+                        )
                     ]
-                )
+                ),
             ]
-        ),
+        )
     ],
     className="mb-1",
 )
@@ -593,6 +641,7 @@ def update(
     # Update pie chart
     fig_pie_chart = plot_pie_chart(df, percentage)
 
+    # TODO Align labels left, values right
     # Text element
     final_value_message = [
         f"Values after {investment_period} years",
