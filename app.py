@@ -312,6 +312,7 @@ header = html.H4(
 
 # Principal
 principal_min = 0
+principal_step = 1000
 
 initial_amount_component = html.Div(
     [
@@ -321,6 +322,7 @@ initial_amount_component = html.Div(
             placeholder="Initial amount",
             value=INITIAL_AMOUNT_DEFAULT,
             min=principal_min,
+            step=principal_step,
         )
     ]
 )
@@ -365,6 +367,8 @@ investment_period_input_component = html.Div(
 
 # Additional contributions
 contributions_min = 0
+contributions_step = 100
+
 contributions_component = html.Div(
     [
         dcc.Input(
@@ -373,6 +377,7 @@ contributions_component = html.Div(
             placeholder="Contributions",
             value=CONTRIBUTIONS_DEFAULT,
             min=contributions_min,
+            step=contributions_step,
         )
     ]
 )
