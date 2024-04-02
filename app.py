@@ -222,7 +222,6 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
     return fig
 
 
-# TODO style pie chart
 def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
     """Plotly pie chart of contributions to final investment.
 
@@ -651,7 +650,6 @@ def update(
     # Update pie chart
     fig_pie_chart = plot_pie_chart(df, percentage)
 
-    # TODO Align labels left, values right
     # Text element
     final_value_message = [
         html.Div("Values after {} years".format(investment_period)),
