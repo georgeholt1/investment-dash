@@ -461,7 +461,7 @@ pie_chart_component = html.Div(
 pie_chart_percentage_component = html.Div(
     [
         dcc.Checklist(
-            options=[{"label": "Percentage", "value": "percentage"}],
+            options=[{"label": "Show percentages", "value": "percentage"}],
             id="checklist-percentage",
         )
     ]
