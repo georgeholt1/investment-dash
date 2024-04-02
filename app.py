@@ -494,10 +494,15 @@ pie_card = dbc.Card(
 # App
 # ---
 
-app.layout = dbc.Container(
-    [header, intro, controls_card, final_value_text, graph_card, pie_card],
-    fluid=True,
-    className="dbc",
+app.layout = html.Div(
+    [
+        dbc.Container(
+            [header, intro, controls_card, final_value_text, graph_card, pie_card],
+            fluid=True,
+            className="dbc",
+        )
+    ],
+    style={"marginLeft": "80px", "marginRight": "80px"},
 )
 
 
