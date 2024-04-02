@@ -475,22 +475,37 @@ results_card = dbc.Card([html.H4("Results", className="card-title"), results_com
 
 controls_and_results_cards = dbc.CardGroup([controls_card, results_card])
 
+graph_info = """
+The investment value over time and its components due to the initial
+principal, additional contributions and interest earned are displayed
+here. The line graph shows the values over time, while the pie chart
+shows the breakdown of the final balance. Hover over the plots for
+additional information.
+"""
 graph_card = dbc.Card(
     [
-        dbc.Container(
-            [dbc.Row([breakdown_checklist_component]), dbc.Row([graph_component])]
-        )
-    ]
-)
-
-pie_card = dbc.Card(
-    [
+        html.H4("Graphs", className="card-title"),
+        html.P(graph_info, className="card-text"),
         dbc.Container(
             [
-                dbc.Row([pie_chart_percentage_component]),
-                dbc.Row([pie_chart_component]),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dbc.Row([breakdown_checklist_component]),
+                                dbc.Row([graph_component]),
+                            ]
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Row([pie_chart_percentage_component]),
+                                dbc.Row([pie_chart_component]),
+                            ]
+                        ),
+                    ]
+                )
             ]
-        )
+        ),
     ]
 )
 
@@ -501,7 +516,7 @@ pie_card = dbc.Card(
 app.layout = html.Div(
     [
         dbc.Container(
-            [header, intro, controls_and_results_cards, graph_card, pie_card],
+            [header, intro, controls_and_results_cards, graph_card],
             fluid=True,
             className="dbc",
         )
