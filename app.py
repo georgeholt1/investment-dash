@@ -407,7 +407,13 @@ contributions_component = html.Div(
 results_component = html.P(id="results-text", className="card-text")
 
 # Line graph
-graph_component = html.Div([dcc.Graph(id="graph", figure=plot_line_graph(DF_DEFAULT))])
+graph_component = html.Div(
+    [
+        dcc.Graph(
+            id="graph", figure=plot_line_graph(DF_DEFAULT), style={"height": "40vh"}
+        )
+    ]
+)
 
 breakdown_checklist_component = html.Div(
     [
@@ -421,7 +427,11 @@ breakdown_checklist_component = html.Div(
 
 # Pie chart
 pie_chart_component = html.Div(
-    [dcc.Graph(id="pie-chart", figure=plot_pie_chart(DF_DEFAULT))]
+    [
+        dcc.Graph(
+            id="pie-chart", figure=plot_pie_chart(DF_DEFAULT), style={"height": "40vh"}
+        )
+    ]
 )
 
 pie_chart_percentage_component = html.Div(
@@ -488,6 +498,7 @@ here. The line graph shows the values over time, while the pie chart
 shows the breakdown of the final balance. Hover over the plots for
 additional information.
 """
+
 graph_card = dbc.Card(
     [
         html.H4("Graphs", className="card-title"),
