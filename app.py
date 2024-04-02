@@ -1,32 +1,21 @@
 import dash
-from dash_bootstrap_templates import ThemeChangerAIO, template_from_url
-from dash.dependencies import Input, Output
-from dash import dcc, html
 import dash_bootstrap_components as dbc
-import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
-
-
-# Global colors for plots
-COLOR_CONTRIBUTIONS = '#636EFA'
-COLOR_INTEREST = '#EF553B'
-COLOR_INITIAL = '#00CC96'
+import plotly.graph_objects as go
+from dash import dcc, html
+from dash.dependencies import Input, Output
+from dash_bootstrap_templates import ThemeChangerAIO, template_from_url
 
 
 def compound_interest(
-        initial_amount: float,
-        interest_rate: float,
-        periods: int,
-        contributions: float
-    ) -> (np.ndarray, np.ndarray):
+    initial_amount: float, interest_rate: float, periods: int, contributions: float
+):
     """Calculate compound interest with contributions.
 
-    Assumes additional contributions are made at the start of each period.
+    Assumes additional contributions are made at the start of each
+    period.
 
-    Formula from:
-    https://math.stackexchange.com/questions/1698578/compound-interest-formula-adding-annual-contributions
-    
     Parameters
     ----------
     initial_amount : float
@@ -38,8 +27,8 @@ def compound_interest(
     contributions : float
         Additional contributions made each investment period.
     """
-    periods = np.arange(periods+1)
-    
+    periods = np.arange(periods + 1)
+
     p = initial_amount
     r = interest_rate
     c = contributions
@@ -52,16 +41,13 @@ def compound_interest(
 
 
 def investment_evolution_breakdown(
-        initial_amount: float,
-        interest_rate: float,
-        periods: int,
-        contributions: float
-    ) -> pd.DataFrame:
+    initial_amount: float, interest_rate: float, periods: int, contributions: float
+) -> pd.DataFrame:
     """Evolution of investment over time by contribution.
-    
-    Calculates the total value of investment over a given period broken down 
-    into the amount due to additional contributions and the amount due to
-    interest.
+
+    Calculates the total value of investment over a given period broken
+    down into the amount due to additional contributions and the amount
+    due to interest.
 
     Parameters
     ----------
@@ -80,167 +66,177 @@ def investment_evolution_breakdown(
         With columns:
             - `period` : investment period index
             - `value` : total investment value
-            - `value_from_contributions` : portion of total investment value
-              due to additional contributions
-            - `value_from_interest` : portion of total investment value due
-              to interest
+            - `value_from_contributions` : portion of total investment
+              value due to additional contributions
+            - `value_from_interest` : portion of total investment value
+              due to interest
     """
     periods_list, investment_value = compound_interest(
-        initial_amount,
-        interest_rate,
-        periods,
-        contributions
+        initial_amount, interest_rate, periods, contributions
     )
 
-    investment_contributions = contributions * periods_list + \
-        initial_amount
+    investment_contributions = contributions * periods_list + initial_amount
 
     amount_from_interest = investment_value - investment_contributions
 
-    df = pd.DataFrame({
-        'period': periods_list,
-        'value': investment_value,
-        'value_from_contributions': investment_contributions,
-        'value_from_interest': amount_from_interest
-    })
+    df = pd.DataFrame(
+        {
+            "period": periods_list,
+            "value": investment_value,
+            "value_from_contributions": investment_contributions,
+            "value_from_interest": amount_from_interest,
+        }
+    )
 
     return df
 
 
 def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
     """Plotly line graph of investment over time.
-    
+
     Parameters
     ----------
     df : pandas DataFrame
         DataFrame containing investment value over time.
     show_breakdown : bool, optional
-        Whether to show breakdown of total investment amount due to 
+        Whether to show breakdown of total investment amount due to
         contributions and interest. Defaults to False.
     """
     # Adding a 'year' column for plotting
-    df['year'] = df['period'] / 12
+    df["year"] = df["period"] / 12
 
-    # Adding a 'year_month' column for tooltip display, assuming 'period' starts from 1 for the first month.
-    df['year_month'] = df['period'].apply(lambda x: f"Year {x // 12}, Month {x % 12 if x % 12 != 0 else 12}")
+    # Adding a 'year_month' column for tooltip display, assuming
+    # 'period' starts from 1 for the first month.
+    df["year_month"] = df["period"].apply(
+        lambda x: f"Year {x // 12}, Month {x % 12 if x % 12 != 0 else 12}"
+    )
 
     marker_sizes = [0] * (len(df) - 1) + [10]
-    
+
     fig = go.Figure()
 
     # Main balance
-    fig.add_trace(go.Scatter(
-        x=df['year'],
-        y=df['value'],
-        mode='lines+markers',
-        marker=dict(size=marker_sizes, color=COLOR_CONTRIBUTIONS, symbol='circle'),
-        line=dict(color=COLOR_CONTRIBUTIONS),
-        showlegend=False,
-        hoverinfo='skip',
-    ))
-    fig.add_trace(go.Scatter(
-        x=[None],
-        y=[None],
-        name='Balance',
-        mode='lines+markers',
-        marker=dict(color=COLOR_CONTRIBUTIONS, symbol='circle'),
-        line=dict(color=COLOR_CONTRIBUTIONS),
-        showlegend=True,
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=df["year"],
+            y=df["value"],
+            mode="lines+markers",
+            marker=dict(size=marker_sizes, color=COLOR_CONTRIBUTIONS, symbol="circle"),
+            line=dict(color=COLOR_CONTRIBUTIONS),
+            showlegend=False,
+            hoverinfo="skip",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            name="Balance",
+            mode="lines+markers",
+            marker=dict(color=COLOR_CONTRIBUTIONS, symbol="circle"),
+            line=dict(color=COLOR_CONTRIBUTIONS),
+            showlegend=True,
+        )
+    )
 
     # Dummy plot for hover text
     if not show_breakdown:
-        hovertext=df.apply(lambda x: f"<b>{x['year_month']}</b><br>Balance: {x['value']:,.2f}", axis=1)
+        hovertext = df.apply(
+            lambda x: f"<b>{x['year_month']}</b><br>Balance: {x['value']:,.2f}", axis=1
+        )
     else:
-        hovertext=df.apply(lambda x: f"<b>{x['year_month']}</b><br>Balance: {x['value']:,.2f}<br>Total contributions: {x['value_from_contributions']:,.2f}<br>Total interest: {x['value_from_interest']:,.2f}", axis=1)
-    
-    fig.add_trace(go.Scatter(
-        x=df['year'],
-        y=df['value'],
-        mode='lines',
-        line=dict(width=0),
-        showlegend=False,
-        hovertext=hovertext,
-        hoverinfo='text'
-    ))
+        hovertext = df.apply(
+            lambda x: f"<b>{x['year_month']}</b><br>Balance: {x['value']:,.2f}<br>Total contributions: {x['value_from_contributions']:,.2f}<br>Total interest: {x['value_from_interest']:,.2f}",
+            axis=1,
+        )
+
+    fig.add_trace(
+        go.Scatter(
+            x=df["year"],
+            y=df["value"],
+            mode="lines",
+            line=dict(width=0),
+            showlegend=False,
+            hovertext=hovertext,
+            hoverinfo="text",
+        )
+    )
 
     if show_breakdown:
         # Principal
-        fig.add_trace(go.Scatter(
-            x=df['year'],
-            y=df['value_from_contributions'],
-            mode='lines+markers',
-            marker=dict(size=marker_sizes, symbol='square', color=COLOR_INITIAL),
-            line=dict(color=COLOR_INITIAL),
-            showlegend=False,
-            hoverinfo='skip',
-            # hoverinfo='text',
-            # text=df.apply(lambda x: f"{x['year_month']}: {x['value_from_contributions']:,.2f}", axis=1)
-        ))
-        fig.add_trace(go.Scatter(
-            x=[None],
-            y=[None],
-            name='Principal',
-            mode='lines+markers',
-            marker=dict(color=COLOR_INITIAL, symbol='square'),
-            line=dict(color=COLOR_INITIAL),
-            showlegend=True
-        ))
+        fig.add_trace(
+            go.Scatter(
+                x=df["year"],
+                y=df["value_from_contributions"],
+                mode="lines+markers",
+                marker=dict(size=marker_sizes, symbol="square", color=COLOR_INITIAL),
+                line=dict(color=COLOR_INITIAL),
+                showlegend=False,
+                hoverinfo="skip",
+            )
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=[None],
+                y=[None],
+                name="Principal",
+                mode="lines+markers",
+                marker=dict(color=COLOR_INITIAL, symbol="square"),
+                line=dict(color=COLOR_INITIAL),
+                showlegend=True,
+            )
+        )
 
         # Interest
-        fig.add_trace(go.Scatter(
-            x=df['year'],
-            y=df['value_from_interest'],
-            mode='lines+markers',
-            marker=dict(size=marker_sizes, symbol='diamond', color=COLOR_INTEREST),
-            showlegend=False,
-            # hoverinfo='text',
-            hoverinfo='skip',
-            # text=df.apply(lambda x: f"{x['year_month']}: {x['value_from_interest']:,.2f}", axis=1)
-        ))
-        fig.add_trace(go.Scatter(
-            x=[None],
-            y=[None],
-            name='Interest',
-            mode='lines+markers',
-            marker=dict(color=COLOR_INTEREST, symbol='diamond'),
-            line=dict(color=COLOR_INTEREST),
-            showlegend=True
-        ))
-    
-    fig.update_xaxes(title='Year')
-    fig.update_yaxes(title='Investment value')
+        fig.add_trace(
+            go.Scatter(
+                x=df["year"],
+                y=df["value_from_interest"],
+                mode="lines+markers",
+                marker=dict(size=marker_sizes, symbol="diamond", color=COLOR_INTEREST),
+                showlegend=False,
+                hoverinfo="skip",
+            )
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=[None],
+                y=[None],
+                name="Interest",
+                mode="lines+markers",
+                marker=dict(color=COLOR_INTEREST, symbol="diamond"),
+                line=dict(color=COLOR_INTEREST),
+                showlegend=True,
+            )
+        )
 
-    fig.update_layout(
-        hovermode='x unified',
-        xaxis_range=(0, df['year'].max()*1.05)
-    )
-    
+    fig.update_xaxes(title="Year")
+    fig.update_yaxes(title="Investment value")
+
+    fig.update_layout(hovermode="x unified", xaxis_range=(0, df["year"].max() * 1.05))
+
     return fig
 
 
 def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
     """Plotly pie chart of contributions to final investment.
-    
+
     Parameters
     ----------
     df : pandas DataFrame
-        DataFrame containing investment value of time. The data in the last
-        row is used for the amount due to contributions and interest and
-        the data in the first row is used for the initial principal.
+        DataFrame containing investment value of time. The data in the
+        last row is used for the amount due to contributions and
+        interest and the data in the first row is used for the initial
+        principal.
     percentage : bool, optional
-        Whether to display data as percentage. Defaults to False, which displays
-        the actual values.
+        Whether to display data as percentage. Defaults to False, which
+        displays the actual values.
     """
-    labels = [
-        'Initial principal',
-        'Contributions',
-        'Interest'
-    ]
+    labels = ["Initial principal", "Contributions", "Interest"]
     values = [
-        df.iloc[0]['value'],
-        df.iloc[-1]['value_from_contributions'],
-        df.iloc[-1]['value_from_interest'],
+        df.iloc[0]["value"],
+        df.iloc[-1]["value_from_contributions"],
+        df.iloc[-1]["value_from_interest"],
     ]
 
     fig = go.Figure(
@@ -248,25 +244,27 @@ def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
             labels=labels,
             values=values,
             sort=False,
-            marker=dict(colors=(
-                '#AB63FA',
-                COLOR_INITIAL,
-                COLOR_INTEREST,
-            ))
+            marker=dict(
+                colors=(
+                    "#AB63FA",
+                    COLOR_INITIAL,
+                    COLOR_INTEREST,
+                )
+            ),
         )
     )
 
     if percentage:
         fig.update_traces(
-            textinfo='percent',
-            hovertemplate='%{label}<br>%{value:,.2f}<extra></extra>',
+            textinfo="percent",
+            hovertemplate="%{label}<br>%{value:,.2f}<extra></extra>",
         )
 
     else:
-        fig.update_traces(texttemplate='%{value:,.2f}')
+        fig.update_traces(texttemplate="%{value:,.2f}")
         fig.update_traces(
-            textinfo='value',
-            hovertemplate='%{label}<br>%{percent:.1%}<extra></extra>',
+            textinfo="value",
+            hovertemplate="%{label}<br>%{percent:.1%}<extra></extra>",
         )
 
     return fig
@@ -284,9 +282,14 @@ DF_DEFAULT = investment_evolution_breakdown(
     INITIAL_AMOUNT_DEFAULT,
     INTEREST_RATE_MONTHLY_DEFAULT,
     PERIODS_MONTHS_DEFAULT,
-    CONTRIBUTIONS_DEFAULT
+    CONTRIBUTIONS_DEFAULT,
 )
-DF_DEFAULT['years']  = DF_DEFAULT['period'] / 12
+DF_DEFAULT["years"] = DF_DEFAULT["period"] / 12
+
+# Global colors for plots
+COLOR_CONTRIBUTIONS = "#636EFA"
+COLOR_INTEREST = "#EF553B"
+COLOR_INITIAL = "#00CC96"
 
 
 # dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
@@ -295,7 +298,7 @@ app = dash.Dash(
     __name__,
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
-    ]
+    ],
 )
 
 
@@ -304,7 +307,7 @@ app = dash.Dash(
 
 header = html.H4(
     "Investment return calculator",
-    className="bg-primary text-white p-3 mb-2 text-center"
+    className="bg-primary text-white p-3 mb-2 text-center",
 )
 
 # Principal
@@ -317,7 +320,7 @@ initial_amount_component = html.Div(
             type="number",
             placeholder="Initial amount",
             value=INITIAL_AMOUNT_DEFAULT,
-            min=principal_min
+            min=principal_min,
         )
     ]
 )
@@ -355,7 +358,7 @@ investment_period_input_component = html.Div(
             value=PERIODS_YEARS_DEFAULT,
             min=investment_period_min,
             max=investment_period_max,
-            step=investment_period_step
+            step=investment_period_step,
         )
     ]
 )
@@ -369,50 +372,37 @@ contributions_component = html.Div(
             type="number",
             placeholder="Contributions",
             value=CONTRIBUTIONS_DEFAULT,
-            min=contributions_min
+            min=contributions_min,
         )
     ]
 )
 
 # Line graph
-graph_component = html.Div(
-    [
-        dcc.Graph(
-            id="graph",
-            figure=plot_line_graph(DF_DEFAULT)
-        )
-    ]
-)
+graph_component = html.Div([dcc.Graph(id="graph", figure=plot_line_graph(DF_DEFAULT))])
 
 breakdown_checklist_component = html.Div(
     [
         dcc.Checklist(
-            options=[{'label': 'Show breakdown', 'value': 'show-breakdown'}],
-            value=['show-breakdown'],
-            id='checklist-breakdown',
+            options=[{"label": "Show breakdown", "value": "show-breakdown"}],
+            value=["show-breakdown"],
+            id="checklist-breakdown",
         )
     ]
 )
 
 # Pie chart
 pie_chart_component = html.Div(
-    [
-        dcc.Graph(
-            id="pie-chart",
-            figure=plot_pie_chart(DF_DEFAULT)
-        )
-    ]
+    [dcc.Graph(id="pie-chart", figure=plot_pie_chart(DF_DEFAULT))]
 )
 
 pie_chart_percentage_component = html.Div(
     [
         dcc.Checklist(
-            options=[{'label': 'Percentage', 'value': 'percentage'}],
-            id='checklist-percentage'
+            options=[{"label": "Percentage", "value": "percentage"}],
+            id="checklist-percentage",
         )
     ]
 )
-
 
 
 # Cards
@@ -421,42 +411,53 @@ pie_chart_percentage_component = html.Div(
 controls_card = dbc.Card(
     [
         html.H4("Settings", className="card-title"),
-        dbc.Container([
-            dbc.Row([
-                dbc.Col([dbc.Label("Principal")]),
-                dbc.Col([initial_amount_component])
-            ]),
-            dbc.Row([
-                dbc.Col([dbc.Label("Rate of return")]),
-                dbc.Col([rate_of_return_input_component]),
-            ]),
-            dbc.Row([
-                dbc.Col([dbc.Label("Period (years)")]),
-                dbc.Col([investment_period_input_component]),
-            ]),
-            dbc.Row([
-                dbc.Col([dbc.Label("Contributions (monthly)")]),
-                dbc.Col([contributions_component])
-            ])
-        ])
+        dbc.Container(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col([dbc.Label("Principal")]),
+                        dbc.Col([initial_amount_component]),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col([dbc.Label("Rate of return")]),
+                        dbc.Col([rate_of_return_input_component]),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col([dbc.Label("Period (years)")]),
+                        dbc.Col([investment_period_input_component]),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col([dbc.Label("Contributions (monthly)")]),
+                        dbc.Col([contributions_component]),
+                    ]
+                ),
+            ]
+        ),
     ]
 )
 
 graph_card = dbc.Card(
     [
-        dbc.Container([
-            dbc.Row([breakdown_checklist_component]),
-            dbc.Row([graph_component])
-        ])
+        dbc.Container(
+            [dbc.Row([breakdown_checklist_component]), dbc.Row([graph_component])]
+        )
     ]
 )
 
 pie_card = dbc.Card(
     [
-        dbc.Container([
-            dbc.Row([pie_chart_percentage_component]),
-            dbc.Row([pie_chart_component]),
-        ])
+        dbc.Container(
+            [
+                dbc.Row([pie_chart_percentage_component]),
+                dbc.Row([pie_chart_component]),
+            ]
+        )
     ]
 )
 
@@ -465,19 +466,13 @@ pie_card = dbc.Card(
 # ---
 
 app.layout = dbc.Container(
-    [
-        header,
-        controls_card,
-        graph_card,
-        pie_card
-    ],
-    fluid=True,
-    className="dbc"
+    [header, controls_card, graph_card, pie_card], fluid=True, className="dbc"
 )
 
 
 # Callbacks
 # ---------
+
 
 @app.callback(
     Output("graph", "figure"),
@@ -498,15 +493,15 @@ def update(
     percentage,
 ):
     # True if box is ticked
-    show_breakdown = 'show-breakdown' in breakdown if breakdown is not None else False
-    percentage = 'percentage' in percentage if percentage is not None else False
+    show_breakdown = "show-breakdown" in breakdown if breakdown is not None else False
+    percentage = "percentage" in percentage if percentage is not None else False
 
     # Update line plot
     df = investment_evolution_breakdown(
         initial_amount,
-        rate_of_return*0.01/12, # convert from percentage
-        investment_period*12,   # convert to months
-        contributions
+        rate_of_return * 0.01 / 12,  # convert from percentage
+        investment_period * 12,  # convert to months
+        contributions,
     )
     fig_line_graph = plot_line_graph(df, show_breakdown)
 
