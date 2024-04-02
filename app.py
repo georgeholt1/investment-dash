@@ -213,7 +213,11 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
     fig.update_xaxes(title="Year")
     fig.update_yaxes(title="Investment value")
 
-    fig.update_layout(hovermode="x unified", xaxis_range=(0, df["year"].max() * 1.05))
+    fig.update_layout(
+        hovermode="x unified",
+        xaxis_range=(0, df["year"].max() * 1.05),
+        margin=dict(t=10, b=10),
+    )
 
     return fig
 
@@ -266,6 +270,8 @@ def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
             textinfo="value",
             hovertemplate="%{label}<br>%{percent:.1%}<extra></extra>",
         )
+
+    fig.update_layout(margin=dict(t=10, b=10))
 
     return fig
 
@@ -570,7 +576,6 @@ def update(
     fig_pie_chart = plot_pie_chart(df, percentage)
 
     # Text element
-
     final_value_message = [
         f"Values after {investment_period} years",
         html.Br(),
