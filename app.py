@@ -331,9 +331,10 @@ intro = html.P(
     className="text-center mb-4",
 )
 
+# TODO Add notification when invalid number entered
 # Principal
 principal_min = 0
-principal_step = 1000
+principal_step = 0.01
 
 initial_amount_component = html.Div(
     [
@@ -356,7 +357,7 @@ initial_amount_component = html.Div(
 # Rate of return
 rate_of_return_min = 0
 rate_of_return_max = 100
-rate_of_return_step = 0.1
+rate_of_return_step = 0.01
 
 rate_of_return_input_component = html.Div(
     [
@@ -405,7 +406,7 @@ investment_period_input_component = html.Div(
 
 # Additional contributions
 contributions_min = 0
-contributions_step = 100
+contributions_step = 0.01
 
 contributions_component = html.Div(
     [
@@ -457,6 +458,7 @@ pie_chart_component = html.Div(
     ]
 )
 
+# TODO Change to toggle
 pie_chart_percentage_component = html.Div(
     [
         dcc.Checklist(
