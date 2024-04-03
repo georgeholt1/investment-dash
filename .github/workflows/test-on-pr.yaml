@@ -9,11 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: ./
     - name: Setup Miniconda
       uses: conda-incubator/setup-miniconda@v3.0.3
       with:
-        activate-environment: investment-dash
         environment-file: conda_env.yml
+        activate-environment: investment-dash
         auto-activate-base: false
     - name: Run pytest
       run: |
