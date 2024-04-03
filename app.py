@@ -691,4 +691,10 @@ def update(
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--debug", action="store_true")
+    args = parser.parse_args()
+
+    app.run_server(debug=args.debug)
