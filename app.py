@@ -351,7 +351,6 @@ initial_amount_component = html.Div(
             ]
         )
     ],
-    id="styled-numeric-input",
 )
 
 # Rate of return
@@ -377,7 +376,6 @@ rate_of_return_input_component = html.Div(
             ]
         )
     ],
-    id="styled-numeric-input",
 )
 
 # Period
@@ -403,7 +401,6 @@ investment_period_input_component = html.Div(
             ]
         )
     ],
-    id="styled-numeric-input",
 )
 
 # Additional contributions
@@ -427,7 +424,6 @@ contributions_component = html.Div(
             ]
         )
     ],
-    id="styled-numeric-input",
 )
 
 # Final value
