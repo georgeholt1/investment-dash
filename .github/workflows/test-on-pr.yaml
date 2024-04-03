@@ -5,19 +5,34 @@ on:
     branches: [ main ]
 
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
+
     defaults:
       run:
         shell: bash -el {0}
+
     steps:
+
     - uses: actions/checkout@v2
+
     - name: Setup Miniconda
       uses: conda-incubator/setup-miniconda@v3.0.3
       with:
         environment-file: conda_env.yml
         activate-environment: investment-dash
         auto-activate-base: false
+        
+    - name: Check Black formatting
+      run: |
+        black --check .
+        
+    - name: Check import order with isort
+      run: |
+        isort --check-only .
+        
     - name: Run pytest
       run: |
         pytest
