@@ -444,6 +444,7 @@ breakdown_checklist_component = html.Div(
             options=[{"label": "Show breakdown", "value": "show-breakdown"}],
             value=["show-breakdown"],
             id="checklist-breakdown",
+            inputStyle={"margin-right": "4px"},
         )
     ]
 )
@@ -462,6 +463,7 @@ pie_chart_percentage_component = html.Div(
         dcc.Checklist(
             options=[{"label": "Show percentages", "value": "percentage"}],
             id="checklist-percentage",
+            inputStyle={"margin-right": "4px"},
         )
     ]
 )
