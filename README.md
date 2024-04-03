@@ -6,7 +6,9 @@ The investment settings are controlled through the dashboard interface, which al
 
 ## Usage
 
-The dashboard can be interacted with using a web browser. Once opened, it should look like this:
+The dashboard can be interacted with using a web browser. To install, use either the provided Dockerfile (see [Installation](#installation)) or build from source (see [Development](#development)).
+
+When the application is running, navigate to `localhost:8050` in a web browser. Once opened, it should look like this:
 
 ![App screenshot](/images/app.png)
 
@@ -23,11 +25,29 @@ The settings, results and interactive elements are described in the dashboard. S
 
 ## Installation
 
+A [Docker](https://www.docker.com/) image can be built with the provided Dockerfile. To do so, run
+```bash
+docker build -t investment-dash-app .
+```
+
+from the project root directory, then launch the image with
+```bash
+docker run -p 8050:8050 investment-dash-app
+```
+
+Navigate to `localhost:8050` in a browser to see the dashboard.
+
 ## Development
 
-Development dependencies are handled using [conda](https://docs.conda.io/en/latest/) and can be installed by running `conda env create -f conda_env.yml`.
+Development dependencies are handled using [conda](https://docs.conda.io/en/latest/) and can be installed by running
+```bash
+conda env create -f conda_env.yml
+```
 
-To run the application in debug mode: `python app.py --debug`
+To run the application in debug mode:
+```bash
+python app.py --debug
+```
 
 ### Tests
 

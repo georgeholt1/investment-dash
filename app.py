@@ -697,4 +697,4 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--debug", action="store_true")
     args = parser.parse_args()
 
-    app.run_server(debug=args.debug)
+    app.run_server(debug=args.debug, host="0.0.0.0", port=8050)
