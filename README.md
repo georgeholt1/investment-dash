@@ -14,8 +14,10 @@ The settings, results and interactive elements are described in the dashboard. S
 
 - Custom tooltip when hovering over the line graph.  
 <img src="images/line.png" width="500" alt="Screenshot of line graph showing tooltip">
+
 - If percentages are selected to be shown on the pie chart, absolute values are displayed on hover and vice versa.  
 <img src="images/pie.png" width="350" alt="Screenshot of pie chart">
+
 - Custom CSS to indicate when an invalid value has been entered in an input field.  
 <img src="images/invalid.png" width="800" alt="Screenshot showing invalid entry warning">
 
