@@ -1,0 +1,20 @@
+name: Application test
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v3.0.3
+      with:
+        activate-environment: investment-dash
+        environment-file: conda_env.yml
+        auto-activate-base: false
+    - name: Run pytest
+      run: |
+        pytest
