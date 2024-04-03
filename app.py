@@ -328,7 +328,7 @@ specified so that the calculations are valid for all currencies.
 
 intro = html.P(
     intro_text,
-    className="text-center mb-4",
+    className="text-center mb-2",
 )
 
 # Principal
@@ -461,7 +461,6 @@ pie_chart_component = html.Div(
     ]
 )
 
-# TODO Change to toggle
 pie_chart_percentage_component = html.Div(
     [
         dcc.Checklist(
