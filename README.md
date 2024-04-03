@@ -6,10 +6,12 @@ The investment settings are controlled through the dashboard interface, which al
 
 ## Installation
 
-### Installing for development
+## Development
 
-Development dependencies are handled using [conda](https://docs.conda.io/en/latest/) and may be installed by running `conda env create -f conda_env.yml`.
+Development dependencies are handled using [conda](https://docs.conda.io/en/latest/) and can be installed by running `conda env create -f conda_env.yml`.
 
-Pre-commit hooks for formatting code with black and isort can be installed by running `pre-commit install` from the repository root directory.
+Backend logic tests are implemented with [pytest](https://docs.pytest.org/) and can be run by executing `pytest` from the project root directory.
+
+Pre-commit hooks for formatting code with [black](https://github.com/psf/black) and [isort](https://pycqa.github.io/isort/) can be installed by running `pre-commit install` from the repository root directory.
 
 To run the application in debug mode: `python app.py --debug`
