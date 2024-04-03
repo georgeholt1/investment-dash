@@ -331,7 +331,6 @@ intro = html.P(
     className="text-center mb-4",
 )
 
-# TODO Add notification when invalid number entered
 # Principal
 principal_min = 0
 principal_step = 0.01
@@ -351,7 +350,8 @@ initial_amount_component = html.Div(
                 ),
             ]
         )
-    ]
+    ],
+    id="styled-numeric-input",
 )
 
 # Rate of return
@@ -376,7 +376,8 @@ rate_of_return_input_component = html.Div(
                 dbc.InputGroupText("%"),
             ]
         )
-    ]
+    ],
+    id="styled-numeric-input",
 )
 
 # Period
@@ -401,7 +402,8 @@ investment_period_input_component = html.Div(
                 dbc.InputGroupText("years"),
             ]
         )
-    ]
+    ],
+    id="styled-numeric-input",
 )
 
 # Additional contributions
@@ -424,7 +426,8 @@ contributions_component = html.Div(
                 dbc.InputGroupText("per month"),
             ]
         )
-    ]
+    ],
+    id="styled-numeric-input",
 )
 
 # Final value
@@ -473,9 +476,9 @@ pie_chart_percentage_component = html.Div(
 # -----
 
 settings_info_text = """
-Adjust the variables of the investment here by either entering the
-values directly or adjusting them with the arrows that appear when
-hovering over the input boxes.
+Adjust the variables of the investment here. If an invalid value is
+entered, hover over the resulting warning for a description of what
+values are accepted.
 """
 controls_card = dbc.Card(
     [
