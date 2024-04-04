@@ -147,23 +147,79 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         )
     )
 
-    # Dummy plot for hover text
-    if not show_breakdown:
-        hovertext = df.apply(
-            lambda x: f"<b>{x['year_month']}</b><br>Balance: {x['value']:,.2f}", axis=1
-        )
-    else:
+    def generate_hovertext(df, show_breakdown):
+        """
+        Generate hovertext for Plotly figures with dynamic padding for
+        alignment.
+
+        Creates hovertext strings for each row in a DataFrame, formatted
+        with labels and values. If `show_breakdown` is True, detailed
+        information is included; otherwise, only balance information is
+        shown. Dynamic padding is applied to ensure alignment of values
+        in the hovertext.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            The DataFrame containing the data. Must include the columns:
+            'year_month', 'value', 'value_from_contributions',
+            'value_from_interest', and 'monthly_interest'. The function
+            adds formatted string versions of these columns for
+            hovertext generation.
+        show_breakdown : bool
+            If True, include detailed breakdown information
+            (contributions, interest, etc.) in the hovertext. Otherwise,
+            show only the year-month and balance.
+
+        Returns
+        -------
+        pandas.Series
+            A series of strings containing the HTML-formatted hovertext
+            for each row in the DataFrame, ready to be used in a Plotly
+            figure.
+        """
+        labels_full = {
+            "value": "Balance:",
+            "value_from_contributions": "Total contributions:",
+            "value_from_interest": "Total interest:",
+            "monthly_interest": "Interest this month:",
+        }
+        labels = labels_full if show_breakdown else {"value": "Balance:"}
+
+        for column in labels_full.keys():
+            df[f"{column}_str"] = df[column].apply(lambda x: f"{x:,.2f}")
+
+        max_length_per_type = {
+            key: df[f"{key}_str"].str.len().max() + len(label) + 1
+            for key, label in labels.items()
+        }
+
+        if show_breakdown:
+            max_length = max(max_length_per_type.values())
+        else:
+            max_length = max_length_per_type["value"] + len(labels["value"]) + 1
+
         hovertext = df.apply(
             lambda x: (
                 f"<b>{x['year_month']}</b><br>"
-                f"Balance: {x['value']:,.2f}<br>"
-                f"Total contributions: {x['value_from_contributions']:,.2f}<br>"
-                f"Total interest: {x['value_from_interest']:,.2f}<br>"
-                f"Interest earned this month: {x['monthly_interest']:,.2f}"
+                + "<br>".join(
+                    [
+                        f"{label} {' ' * (max_length - len(x[f'{col}_str']) - len(label) - 1)}{x[f'{col}_str']}"
+                        for col, label in (
+                            labels.items()
+                            if show_breakdown
+                            else [("value", "Balance:")]
+                        )
+                    ]
+                )
             ),
             axis=1,
         )
 
+        return hovertext
+
+    # Dummy plot for hover text
+    hovertext = generate_hovertext(df, show_breakdown)
     fig.add_trace(
         go.Scatter(
             x=df["year"],
@@ -175,6 +231,7 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
             hoverinfo="text",
         )
     )
+    fig.update_layout(hoverlabel=dict(font_family="Courier New, monospace"))
 
     if show_breakdown:
         # Principal
