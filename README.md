@@ -6,11 +6,14 @@ The investment settings are controlled through the dashboard interface, which al
 
 :link: [Link](https://investment-return-dashboard.onrender.com) to the deployed application.
 
+:exclamation: **Important note**  
+The above link may take a couple of minutes to open the application. This is because it's hosted using the free tier on [Render](https://render.com/), which automatically puts applications in a dormant state between periods of inactivity.
+
 ## Usage
 
 The dashboard can be interacted with using a web browser.
 
-To access the app deployed on Render, follow [this link](https://investment-return-dashboard.onrender.com).
+To access the app deployed on Render, follow [this link](https://investment-return-dashboard.onrender.com). (❗See the important note in the [introduction](#investment-return-dashboard).)
 
 Alternatively, build the app locally by using either the provided Dockerfile (see [Installation](#installation)) or from source (see [Development](#development)).
 
