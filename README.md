@@ -30,12 +30,12 @@ A [Docker](https://www.docker.com/) image can be built with the provided Dockerf
 docker build -t investment-dash-app .
 ```
 
-from the project root directory, then launch the image with
+from the project root directory. The production app is served by [gunicorn](https://gunicorn.org/) on port 8000, so spin up the container with
 ```bash
-docker run -p 8050:8050 investment-dash-app
+docker run -p 8000:8000 investment-dash-app
 ```
 
-Navigate to `localhost:8050` in a browser to see the dashboard.
+Navigate to `localhost:8000` in a browser to see the dashboard.
 
 ## Development
 
