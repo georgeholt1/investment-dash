@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from dash import dcc, html
 from dash.dependencies import Input, Output
+from dash.exceptions import PreventUpdate
 from dash_bootstrap_templates import ThemeChangerAIO, template_from_url
 
 
@@ -633,6 +634,56 @@ def update(
     breakdown,
     percentage,
 ):
+    """
+    Updates the figures and text outputs for the investment calculator
+    app based on user inputs.
+
+    This callback function is triggered by any change in the input
+    fields for initial amount, rate of return, investment period, and
+    regular contributions, as well as the selections in the checklist
+    options for breakdown and percentage display. It calculates the
+    investment growth over time, updates the line graph and pie chart
+    figures, and constructs a message displaying the final values after
+    the investment period.
+
+    Parameters
+    ----------
+    initial_amount : float
+        The initial amount of money invested.
+    rate_of_return : float
+        The expected annual rate of return.
+    investment_period : int
+        The period of investment in years.
+    contributions : float
+        The amount of regular contributions.
+    breakdown : list of str or None
+        A list containing the selection options for showing breakdowns
+        in the graph. None if no option is selected.
+    percentage : list of str or None
+        A list containing the selection options for showing values as
+        percentages in the pie chart. None if no option is selected.
+
+    Raises
+    ------
+    PreventUpdate
+        If any of the input values are None, indicating an incomplete
+        form, the callback execution is aborted to prevent an update.
+
+    Returns
+    -------
+    tuple
+        A tuple containing three elements:
+        - The figure object for the line graph showing investment growth
+        over time.
+        - The figure object for the pie chart showing the final
+        distribution of investment.
+        - A list of Dash HTML components representing the text message
+        with final investment values.
+    """
+    # Catch the case where an input box is empty
+    if None in (initial_amount, rate_of_return, investment_period, contributions):
+        raise PreventUpdate()
+
     # True if box is ticked
     show_breakdown = "show-breakdown" in breakdown if breakdown is not None else False
     percentage = "percentage" in percentage if percentage is not None else False
@@ -690,6 +741,55 @@ def update(
     ]
 
     return fig_line_graph, fig_pie_chart, final_value_message
+
+
+@app.callback(
+    Output("input-initial-amount", "className"),
+    Output("input-rate-of-return", "className"),
+    Output("input-investment-period", "className"),
+    Output("input-contributions", "className"),
+    Input("input-initial-amount", "value"),
+    Input("input-rate-of-return", "value"),
+    Input("input-investment-period", "value"),
+    Input("input-contributions", "value"),
+)
+def update_input_style(input_amount, input_return, input_period, input_contributions):
+    """
+    Update the className for each input field based on whether the field
+    is empty.
+
+    This function checks each of the four input fields: initial amount,
+    rate of return, investment period, and contributions. If any input
+    field is empty (None), it assigns the "invalid-or-empty" className
+    to that field, applying custom styling defined for this class.
+    Otherwise, it clears the className, implying default or no special
+    styling.
+
+    Parameters
+    ----------
+    input_amount : float or None
+        The value entered in the initial amount input field. None if the
+        field is empty.
+    input_return : float or None
+        The value entered in the rate of return input field. None if the
+        field is empty.
+    input_period : int or None
+        The value entered in the investment period input field. None if
+        the field is empty.
+    input_contributions : float or None
+        The value entered in the contributions input field. None if the
+        field is empty.
+
+    Returns
+    -------
+    list of str
+        A list containing the className for each of the four input
+        fields. Each element of the list corresponds to the className
+        for the respective input field, determined by whether the
+        field's value is None (empty) or not.
+    """
+    inputs = [input_amount, input_return, input_period, input_contributions]
+    return list(map(lambda x: "" if x is not None else "invalid-or-empty", inputs))
 
 
 if __name__ == "__main__":
