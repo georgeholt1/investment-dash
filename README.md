@@ -8,7 +8,7 @@ The investment settings are controlled through the dashboard interface, which al
 
 The dashboard can be interacted with using a web browser. To install, use either the provided Dockerfile (see [Installation](#installation)) or build from source (see [Development](#development)).
 
-When the application is running, navigate to `localhost:8050` in a web browser. Once opened, it should look like this:
+Once opened, the dashboard looks like this:
 
 ![App screenshot](/images/app.png)
 
