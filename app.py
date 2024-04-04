@@ -112,6 +112,9 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         lambda x: f"Year {x // 12}, Month {x % 12 if x % 12 != 0 else 12}"
     )
 
+    # Calculating monthly interest
+    df["monthly_interest"] = df["value_from_interest"].diff().fillna(0)
+
     marker_sizes = [0] * (len(df) - 1) + [10]
 
     fig = go.Figure()
@@ -147,7 +150,13 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
         )
     else:
         hovertext = df.apply(
-            lambda x: f"<b>{x['year_month']}</b><br>Balance: {x['value']:,.2f}<br>Total contributions: {x['value_from_contributions']:,.2f}<br>Total interest: {x['value_from_interest']:,.2f}",
+            lambda x: (
+                f"<b>{x['year_month']}</b><br>"
+                f"Balance: {x['value']:,.2f}<br>"
+                f"Total contributions: {x['value_from_contributions']:,.2f}<br>"
+                f"Total interest: {x['value_from_interest']:,.2f}<br>"
+                f"Interest earned this month: {x['monthly_interest']:,.2f}"
+            ),
             axis=1,
         )
 
