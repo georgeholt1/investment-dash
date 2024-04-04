@@ -109,7 +109,11 @@ def plot_line_graph(df: pd.DataFrame, show_breakdown: bool = False):
     # Adding a 'year_month' column for tooltip display, assuming
     # 'period' starts from 1 for the first month.
     df["year_month"] = df["period"].apply(
-        lambda x: f"Year {x // 12}, Month {x % 12 if x % 12 != 0 else 12}"
+        lambda x: (
+            "Year 0, Month 0"
+            if x == 0
+            else f"Year {x // 12}, Month {x % 12 if x % 12 != 0 else 12}"
+        )
     )
 
     # Calculating monthly interest
