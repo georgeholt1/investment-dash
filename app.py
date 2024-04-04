@@ -237,10 +237,13 @@ def plot_pie_chart(df: pd.DataFrame, percentage: bool = False):
         displays the actual values.
     """
     labels = ["Initial principal", "Contributions", "Interest"]
+    initial_principal = df.iloc[0]["value"]
+    contributions = df.iloc[-1]["value_from_contributions"] - initial_principal
+    interest = df.iloc[-1]["value_from_interest"]
     values = [
-        df.iloc[0]["value"],
-        df.iloc[-1]["value_from_contributions"],
-        df.iloc[-1]["value_from_interest"],
+        initial_principal,
+        contributions,
+        interest,
     ]
 
     fig = go.Figure(
@@ -297,8 +300,6 @@ COLOR_CONTRIBUTIONS = "#636EFA"
 COLOR_INTEREST = "#EF553B"
 COLOR_INITIAL = "#00CC96"
 
-
-# dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
 
 app = dash.Dash(
     __name__,
