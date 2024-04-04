@@ -4,9 +4,15 @@ This project contains a [Dash](https://plotly.com/dash/) application that can be
 
 The investment settings are controlled through the dashboard interface, which also dynamically shows the resulting balance and its breakdown over time in interactive plots.
 
+:link: [Link](https://investment-return-dashboard.onrender.com) to the deployed application.
+
 ## Usage
 
-The dashboard can be interacted with using a web browser. To install, use either the provided Dockerfile (see [Installation](#installation)) or build from source (see [Development](#development)).
+The dashboard can be interacted with using a web browser.
+
+To access the app deployed on Render, follow [this link](https://investment-return-dashboard.onrender.com).
+
+Alternatively, build the app locally by using either the provided Dockerfile (see [Installation](#installation)) or from source (see [Development](#development)).
 
 Once opened, the dashboard looks like this:
 
