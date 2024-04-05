@@ -1,5 +1,7 @@
 # Investment Return Dashboard
 
+![tests](https://img.shields.io/github/actions/workflow/status/georgeholt1/investment-dash/test-on-pr.yaml?label=tests&branch=main)
+
 This project contains a [Dash](https://plotly.com/dash/) application that can be used to calculate and visualise the future value of an investment, including additional contributions and interest, over a given period of time. 
 
 The investment settings are controlled through the dashboard interface, which also dynamically shows the resulting balance and its breakdown over time in interactive plots.
