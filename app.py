@@ -674,8 +674,17 @@ app.layout = html.Div(
         dbc.Container(
             [header, intro, controls_and_results_cards, graph_card],
             fluid=True,
-            className="dbc",
-        )
+            className="d-none d-lg-block",
+        ),
+        html.Div(
+            id="mobile-warning",
+            children=[
+                html.H1("Application not yet available on mobile"),
+                html.P("Please access this application from a browser on a PC"),
+            ],
+            className="d-lg-none",
+            style={"text-align": "center", "padding-top": "20px"},
+        ),
     ],
     style={"marginLeft": "80px", "marginRight": "80px"},
 )
