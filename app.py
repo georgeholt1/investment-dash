@@ -541,6 +541,8 @@ pie_chart_percentage_component = html.Div(
     ]
 )
 
+# Footer
+footer = html.Footer("Copyright \u00A9 2024 George Holt")
 
 # Cards
 # -----
@@ -672,7 +674,7 @@ graph_card = dbc.Card(
 app.layout = html.Div(
     [
         dbc.Container(
-            [header, intro, controls_and_results_cards, graph_card],
+            [header, intro, controls_and_results_cards, graph_card, footer],
             fluid=True,
             className="d-none d-lg-block",
         ),
