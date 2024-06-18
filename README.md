@@ -9,7 +9,7 @@ The investment settings are controlled through the dashboard interface, which al
 :link: [Link](https://investment-return-dashboard.onrender.com) to the deployed application.
 
 :exclamation: **Important note**  
-The above link may take a couple of minutes to open the application. This is because it's hosted using the free tier on [Render](https://render.com/), which automatically puts applications in a dormant state between periods of inactivity.
+The above link may take a couple of minutes to open the application. This is because it's hosted using the free tier on [Render](https://render.com/), which automatically puts applications in a dormant state between periods of inactivity. Sometimes the app will not cold start due to an issue on Render's end. In that case, follow the instructions below to build the app locally.
 
 ## Usage
 
